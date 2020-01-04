@@ -1,0 +1,19 @@
+{
+  "name": "stevans_store",
+  "version": "1.0.0",
+  "description": "This is an Online Store Developed In pure JS (Specifically Node.Js).",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "Toxic254"
+  },
+  "author": "Cyrus N. Gichuki",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  }
+}
