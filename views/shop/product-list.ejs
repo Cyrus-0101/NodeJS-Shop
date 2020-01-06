@@ -1,0 +1,36 @@
+<%- include('../includes/head.ejs') %>
+<link rel="stylesheet" href="/css/product.css">
+</head>
+
+<body>
+    <%- include('../includes/navigation.ejs') %>
+
+    </header>
+    
+    <main>
+        <% if (prods.length > 0) { %>
+        <div class="grid">
+            <% for (let product of prods) { %>
+            <article class="card product-item">
+                <header class="card__header">
+                    <h1 class="product__title"><%= product.title %></h1>
+                </header>
+                <div class="card__image">
+                    <img src="https://images-na.ssl-images-amazon.com/images/I/410DihU%2BoYL._SX466_.jpg" alt="Tie Rod End FSR NRR 87-91">
+                </div>
+                <div class="card__content">
+                    <h2 class="product__price">Ksh. 4599</h2>
+                    <p class="product__description">We have both linkages in pairs Front and Rear.</p>
+                </div>
+                <div class="card__actions">
+                    <button class="btn">Add to Cart</button>
+                </div>
+            </article>
+            <% } %>
+        </div>
+        <% } else { %>
+            <h1>No products found...</h1>
+        <% } %>
+    </main>
+    
+<%- include('../includes/end.ejs') %>
