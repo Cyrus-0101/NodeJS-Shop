@@ -27,6 +27,13 @@ exports.getCart = (req, res, next) => {
     });
 };
 
+exports.getOrders = (req, res, next) => {
+    res.render('shop/orders', {
+        pageTitle: 'Stevans Auto Spares: My Orders',
+        path: '/orders'
+    });
+};
+
 exports.getCheckout = (req, res, next) => {
     res.render('shop/checkout', {
         pageTitle: 'Stevans Auto Spares: Checkout',

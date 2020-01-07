@@ -16,15 +16,17 @@
                     <h1 class="product__title"><%= product.title %></h1>
                 </header>
                 <div class="card__image">
-                    <img src="https://images-na.ssl-images-amazon.com/images/I/410DihU%2BoYL._SX466_.jpg" alt="Tie Rod End FSR NRR 87-91">
+                    <img src="<%= product.imageUrl %>" alt="<%= product.title %>">
                 </div>
                 <div class="card__content">
-                    <h2 class="product__price">Ksh. 4599</h2>
-                    <p class="product__description">We have both linkages in pairs Front and Rear.</p>
+                    <h2 class="product__price">Ksh. <%= product.price %> </h2>
+                    <p class="product__description"><%= product.description %></p>
                 </div>
                 <div class="card__actions">
-                    <button class="btn">Add to Cart</button>
-                </div>
+                    <form action="/add-to-cart" method="POST">
+                        <button class="btn">Add to Cart</button>
+                    </form>
+                </div>    
             </article>
             <% } %>
         </div>
