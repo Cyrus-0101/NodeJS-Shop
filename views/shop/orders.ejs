@@ -3,8 +3,23 @@
 <body>
 <%- include('../includes/navigation.ejs') %>
     <main>
+        <% if (orders.length <= 0 ) { %>
         <h1>
-            Nothing here yet!<br /> <br />  <hr /> <br />  Off to Mars... 🚀 🌖
+            Nothing here yet!<br /> <br />  <hr /> <br />  Head Over to the shop see what we have. 🚀 🌖
         </h1>
+        <% } else { %>
+            <ul>
+                <% orders.forEach(order => { %>
+                    <li>
+                        <h1># <%= order.id %></h1>
+                        <ul>
+                            <% order.products.forEach(product => { %>
+                            <li><%= product.title %> (<%= product.orderItem.quantity %>)</li>
+                            <% }); %>
+                        </ul>
+                    </li>
+                <% }); %>
+            </ul>    
+        <% } %>
     </main>
 <%- include('../includes/end.ejs') %>
