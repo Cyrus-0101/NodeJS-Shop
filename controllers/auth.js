@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const sendgridTransport = require('nodemailer-sendgrid-transport');
+const { validationResult } = require('express-validator/check');
 
 const User = require('../models/user');
 
@@ -21,7 +22,12 @@ exports.getLogin = (req, res, next) => {
     res.render('auth/login', {
         path: '/login',
         pageTitle: 'Stevans Auto Spares: Login',
-        errorMessage: message
+        errorMessage: message,
+        oldInput: { 
+            email: '', 
+            password: ''
+        },
+        validationErrors: []
     });
   };
 
@@ -35,18 +41,45 @@ exports.getSignUp = (req, res, next) => {
     res.render('auth/signup', {
         path: '/signup',
         pageTitle: 'Stevans Auto Spares: Sign-Up',
-        errorMessage: message
+        errorMessage: message,
+        oldInput: { 
+            email: '', 
+            password: '',
+            confirmPassword: ''
+        },
+        validationErrors: []
     });
 }
 
 exports.postLogin = (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).render('auth/login', {
+            path: '/login',
+            pageTitle: 'Stevans Auto Spares: Login',
+            errorMessage: errors.array()[0].msg,
+            oldInput: { 
+                email: email, 
+                password: password
+            },
+            validationErrors: errors.array()
+        });
+    }
     User.findOne({ email: email })
         .then(user => {
             if (!user) {
-                req.flash('error', 'Invalid E-Mail or Password!');
-                return res.redirect('/login');
+                return res.status(422).render('auth/login', {
+                    path: '/login',
+                    pageTitle: 'Stevans Auto Spares: Login',
+                    errorMessage: 'Invalid E-Mail or Password!',
+                    oldInput: { 
+                        email: email, 
+                        password: password
+                    },
+                    validationErrors: []
+                });
             }
             bcrypt
                 .compare(password, user.password)
@@ -59,51 +92,70 @@ exports.postLogin = (req, res, next) => {
                     res.redirect('/');
                     });
                 }
-                req.flash('error', 'Invalid E-Mail or Password!');
-                res.redirect('/login');
+                return res.status(422).render('auth/login', {
+                    path: '/login',
+                    pageTitle: 'Stevans Auto Spares: Login',
+                    errorMessage: 'Invalid E-Mail or Password!',
+                    oldInput: { 
+                        email: email, 
+                        password: password
+                    },
+                    validationErrors: []
+                });
                 })
                 .catch(err => {
                     console.log(err);
                     res.redirect('/login');
                 });
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+          });
   };
 
 exports.postSignUp = (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
-    const confirmPassword = req.body.confirmPasssword;
-    User.findOne({ email: email })
-        .then(userDoc => {
-            if (userDoc) {
-                req.flash('error', 'E-Mail already exists. Try a different one!');
-                return res.redirect('/signup');
-            }
-            return bcrypt
-                .hash(password, 12)
-                .then(hashedPassword => {
-                    const user = new User({
-                    email: email,
-                    password: hashedPassword,
-                    cart: { items: [] }  
-                    });
-                    return user.save();
-                })
-                .then(result => {
-                    res.redirect('/login');
-                    return transporter.sendMail({
-                        to: email,
-                        from: 'shop@stevansautospares.com',
-                        subject: 'Welcome Aboard!',
-                        html: '<h1>Hey...</h1><p>Welcome aboard Stevans Auto Spares. You are seeing this message because you have successfully signed up.'
-                    });
-                })
-                .catch(err => {
-                    console.log(err);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).render('auth/signup', {
+            path: '/signup',
+            pageTitle: 'Stevans Auto Spares: Sign-Up',
+            errorMessage: errors.array()[0].msg,
+            oldInput: { 
+                email: email, 
+                password: password,
+                confirmPassword: req.body.confirmPassword
+            },
+            validationErrors: errors.array()
+        })
+    }
+    bcrypt
+        .hash(password, 12)
+        .then(hashedPassword => {
+            const user = new User({
+                email: email,
+                password: hashedPassword,
+                cart: { items: [] }  
+                });
+            return user.save();
+        })
+        .then(result => {
+            res.redirect('/login');
+                return transporter.sendMail({
+                    to: email,
+                    from: 'shop@stevansautospares.com',
+                    subject: 'Welcome Aboard!',
+                    html: '<h1>Hey...</h1><p>Welcome aboard Stevans Auto Spares. You are seeing this message because you have successfully signed up.'
                 });
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+        });
 };  
 
 exports.postLogout = (req, res, next) => {
@@ -151,16 +203,19 @@ exports.postReset = (req, res, next) => {
                     from: 'no-reply@stevansautospares.com',
                     subject: 'PASSWORD RESET!',
                     html: `
-                        <h1>Hey...</h1>
+                        <h3>Hey, from Stevans Auto Spares smile.</h3>
                         <p>
-                           You are seeing this message because there was request to change your email.
-                           Click this <a href="http://localhost:4000/reset/${token}">link<a/> to reset your password!
+                           You are seeing this message because a request from your account to reset your password.
+                           Click this <a href="http://localhost:4000/reset/${token}">link<a/> to reset your password! 
+                           <b>This link is only valid for 8 hours.</b>
                         </p>
                             `
                 });  
             })
             .catch(err => {
-                console.log(err);
+                const error = new Error(err);
+                error.httpStatusCode = 500;
+                return next(error);
             });
     });
 };
@@ -188,7 +243,11 @@ exports.getNewPassword = (req, res, next) => {
                 passwordToken: token
             });
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+        });
 };
 
 exports.postNewPassword = (req, res, next) => {
@@ -214,7 +273,23 @@ exports.postNewPassword = (req, res, next) => {
             return resetUser.save();
         })
         .then(result => {
-            res.redirect('/login')
+            res.redirect('/login');
+            transporter.sendMail({
+                to: req.body.email,
+                from: 'no-reply@stevansautospares.com',
+                subject: 'PASSWORD RESET SUCCESSFUL!',
+                html: `
+                    <h1>Hey...</h1>
+                    <p>
+                       You are seeing this message because a request was made to change your password.
+                       If this was you ignore this, otherwise configure your password again for better security.
+                    </p>
+                        `
+            });
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+        });
 };

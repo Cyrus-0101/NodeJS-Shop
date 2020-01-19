@@ -26,6 +26,7 @@
     "ejs-lint": "^1.0.1",
     "express": "^4.17.1",
     "express-session": "^1.17.0",
+    "express-validator": "^6.3.1",
     "mongodb": "^3.4.1",
     "mongoose": "^5.8.7",
     "mysql2": "^2.1.0",
