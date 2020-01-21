@@ -22,13 +22,11 @@ router.post('/add-product', [
         .isString()
         .isLength({ min: 5 })
         .trim(),
-    body('imageUrl')
-        .isURL(),
     body('price')
         .isFloat(),
     body('description')
-        .isLength({ min: 10, max: 400 })
         .trim()
+        .isLength({ min: 10, max: 400 })
 ], isAuth, adminController.postAddProduct);
 
 router.get('/edit-product/:productId', isAuth, adminController.getEditProduct);
@@ -38,13 +36,11 @@ router.post('/edit-product', [
         .isString()
         .isLength({ min: 5 })
         .trim(),
-    body('imageUrl')
-        .isURL(),
     body('price')
         .isFloat(),
     body('description')
-        .isLength({ min: 10, max: 400 })
         .trim()
+        .isLength({ min: 10, max: 400 })
 ], isAuth, adminController.postEditProduct);
 
 router.post('/delete-product', isAuth, adminController.postDeleteProduct);
