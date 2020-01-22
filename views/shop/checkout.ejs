@@ -1,0 +1,34 @@
+<%- include('../includes/head.ejs') %>
+    <link rel="stylesheet" href="/css/cart.css">
+    <script src="https://js.stripe.com/v3/"></script>
+    </head>
+    <body>
+        <%- include('../includes/navigation.ejs') %>
+        <main>
+            <ul class="cart__item-list">
+                <% products.forEach(p => { %>
+                    <li class="cart__item">
+                        <h2><%= p.productId.title %></h2>
+                        <h3>Quantity: <%= p.quantity %></h3>
+                    </li>
+                <% }) %>
+            </ul>
+            <div class="centered">
+                <h1>Total: Ksh. <%= totalSum %></h1>
+            </div><hr /><br />
+            <div class="centered">
+                <form action="/create-order" method="POST">
+                    <script 
+                        src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                        data-key="pk_test_VFKjORhjxDwDXmcbFyZPDgns00ETO2gOFZ"
+                        data-amount="<%= totalSum %>"
+                        data-name="Stevans Auto Spares"
+                        data-description="Checkout Now 😀"
+                        data-image="https://i.dlpng.com/static/png/1240484-bald-eagle-logo-clipart-best-clipart-download-angry-eagle-png-600_600_preview.png"
+                        data-locale="auto"
+                        data-currency="usd">
+                    </script>
+                </form>
+            </div>
+        </main>
+        <%- include('../includes/end.ejs') %>

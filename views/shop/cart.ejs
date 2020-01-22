@@ -20,18 +20,21 @@
                 <% }) %>
             </ul><br /> <hr />
             <div class="centered">
-                <form action="/create-order" method="POST">
+                <!-- <form action="/create-order" method="POST">
                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                     <button type="submit" class="btn">
                         Order Now! 💳
                     </button>
-                </form>
+                </form> -->
+                <a href="/checkout" class="btn"> Order Now! 💳 </a>
             </div>
         <% } else { %>
-            <h1>
-                Your Cart is empty. <br /> <hr />
-                Wanna fill her up 🤑
-            </h1>
+            <div class="centered">
+                <h1>
+                    Your Cart is empty. <br /> <hr />
+                    Wanna fill her up 🤑
+                </h1>
+            </div>
                 
         <% } %>
     </main>

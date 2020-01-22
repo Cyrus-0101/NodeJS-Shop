@@ -5,9 +5,11 @@
         <%- include('../includes/navigation.ejs') %>
     <main>
         <% if (orders.length <= 0 ) { %>
-            <h1>
-                Nothing here yet!<br /> <br />  <hr /> <br />  Head Over to the shop see what we have. 🚀 🌖
-            </h1>
+            <div class="centered">
+                <h1>
+                    Nothing here yet!<br /> <br />  <hr /> <br />  Head Over to the shop see what we have. 🚀 🌖
+                </h1>
+            </div>
         <% } else { %>
             <ul class="orders">
                 <% orders.forEach(order => { %>
